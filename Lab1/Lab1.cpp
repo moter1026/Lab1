@@ -15,9 +15,21 @@
 
 int main()
 {
-	std::complex<int> complx( 2, 4 );
-	std::cout << typeid(complx).name() << std::endl;
-	std::cin >> complx;
-	std::cout << complx << std::endl;
+	setlocale(LC_ALL, "ru");
+	function_class::Function<int> FuncInt1(3, false);
+	std::cout << "1. " << FuncInt1 << std::endl;
+	FuncInt1.solutionOfEquation();
+	std::cout << "Решение 1: ";
+	FuncInt1.printSolution();
+	function_class::Function<float> FuncInt2(3, true);
+	std::cout << "2. " << FuncInt2 << std::endl;
+	function_class::Function<double> FuncInt3(3, true);
+	std::cout << "3. " << FuncInt3 << std::endl;
+	function_class::Function<std::complex<int>> FuncInt4(3, true);
+	std::cout << "4. " << FuncInt4 << std::endl;
+	function_class::Function<std::complex<float>> FuncInt5(3, true);
+	std::cout << "5. " << FuncInt5 << std::endl;
+	function_class::Function<std::complex<double>> FuncInt6(3, true);
+	std::cout << "6. " << FuncInt6 << std::endl;
 	return 0;
 }
