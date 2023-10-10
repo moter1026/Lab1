@@ -4,6 +4,7 @@
 #pragma once
 #define _USE_MATH_DEFINES
 
+#include <stdexcept>
 #include <string>
 #include <iostream>
 #include <random>
@@ -13,20 +14,76 @@
 
 
 namespace function_class {
+	// Абстрактный класс для всех классов Function
 	template <typename T>
 	class StartFunction {
 	protected:
 		std::string typeOfT;
 		T* coefficients;
-		T param;
+		//T param;
 		int maxDegree;
-		double solution;
+		long double solution;
 		virtual void fillngCoefficientsNotRandom(int maxDegree) { };
 		virtual void fillngCoefficientsRandom(int maxDegree) { }
 	public:
 		int getMaxDegree() { return this->maxDegree; }
 		T getCoef(int index) { return this->coefficients[index]; }
+		void set(size_t index, T value) {
+			if (index > this->maxDegree) {
+				T* cof = new T[index + 1];
+				for (size_t i = 0; i <= this->maxDegree; ++i)
+				{
+					cof[i] = this->coefficients[i];
+				}
+				delete this->coefficients;
+				this->coefficients = cof;
+				for (size_t i = this->maxDegree; i < index; ++i)
+				{
+					this->coefficients[i] = 0;
+				}
+				this->coefficients[index] = value;
+				this->maxDegree = index;
+			}
+			else if (index <= this->maxDegree) {
+				this->coefficients[index] = value;
+			}
+		}
 		double solutionOfEquation() {};
+		T* operator +(StartFunction<T> secObj) {
+			max = (this->maxDegree > secObj.getMaxDegree()) ? this->maxDegree : secObj.getMaxDegree();
+			T* cof = new T[max + 1];
+			for (size_t i = 0; i <= max; i++)
+			{
+				if (i > this->maxDegree) {
+					cof[i] = secObj[i];
+					continue;
+				}
+				else if (i > secObj.getMaxDegree()) {
+					cof[i] = this->coefficients[i];
+					continue;
+				}
+				cof[i] = secObj[i] + this->coefficients[i];
+			}
+			return cof;
+		}
+		T* operator -(StartFunction<T> secObj) {
+			max = (this->maxDegree > secObj.getMaxDegree()) ? this->maxDegree : secObj.getMaxDegree();
+			T* cof = new T[max + 1];
+			for (size_t i = 0; i <= max; i++)
+			{
+				if (i > this->maxDegree) {
+					cof[i] = -secObj[i];
+					continue;
+				}
+				else if (i > secObj.getMaxDegree()) {
+					cof[i] = this->coefficients[i];
+					continue;
+				}
+				cof[i] = this->coefficients[i] - secObj[i];
+			}
+			return cof;
+		}
+		
 		~StartFunction() = default;
 	};
 
@@ -68,6 +125,12 @@ namespace function_class {
 		Function() {
 			this->typeOfT = typeid(T).name();
 		};
+		Function(int maxDegree) {
+			this->typeOfT = typeid(T).name();
+			this->coefficients = new T[maxDegree + 1];
+			this->maxDegree = maxDegree;
+			fillngCoefficientsRandom(maxDegree);
+		}
 		Function(int maxDegree, bool random) {
 			this->typeOfT = typeid(T).name();
 			this->coefficients = new T[maxDegree + 1];
@@ -77,24 +140,49 @@ namespace function_class {
 			else
 				fillngCoefficientsNotRandom(maxDegree);
 		};
-		
+		Function(std::vector<T> coef) {
+			this->typeOfT = typeid(T).name();
+			this->maxDegree = coef.size() - 1;
+			this->coefficients = new T[this->maxDegree + 1];
+			for (size_t i = 0; i < this->maxDegree; ++i) {
+				this->coefficients[i] = coef[i];
+			}
+		};
+
+		// Функция, находящая корни кубического уравнения
 		void solutionOfEquation() {
 			T	a = this->coefficients[3],
 				b = this->coefficients[2],
 				c = this->coefficients[1],
 				d = this->coefficients[0];
 			// Решение правильное по формуле из википедии
-			long double p = ( ( 3 * a * c - pow((long double)b, 2) ) / ( 3 * pow((long double)a, 2) ) );
-			long double q = (2 * pow((long double)b, 3) - 9 * a * b * c + 27 * pow((long double)a, 2) * d) / 27 * pow((long double)a, 3);
-			long double Q = pow((long double)p / 3, 3) + pow((long double)q / 2, 2);
-			long double alpha = cbrt(-(q / 2) + sqrt(Q));
-			long double beta = cbrt(-(q / 2) - sqrt(Q));
-			this->solution[0] = (alpha + beta) - ((long double)b / 3 * (long double)a);
+			long double p = (((long double)3 * a * c - powl((long double)b, 2) ) / ((long double)3 * powl((long double)a, 2) ) );
+			//std::cout << "p = " << p << std::endl;
+			long double q = ((long double)2 * powf((long double)b, 3) - (long double)9 * a * b * c + (long double)27 * powf((long double)a, 2) * d) / (long double)(27 * powf((long double)a, 3));
+			//std::cout << "q = " << q << std::endl;
+			long double Q = powl((long double)p / 3, 3) + powl((long double)q / 2, 2);
+			//std::cout << "Q = " << Q << std::endl;
+			long double alpha = cbrtl(-((long double)q / 2) + sqrtl(Q));
+			//std::cout << "alpha = " << alpha << std::endl;
+			long double beta = cbrtl(-((long double)q / 2) - sqrtl(Q));
+			//std::cout << "beta = " << beta << std::endl;
+			this->solution = (long double)(alpha + beta) - ((long double)b / ((long double)3 * (long double)a));
+
+
+
+			
 		};
 		void printSolution() {
-			std::cout << this->solution[0] << std::endl;
+			std::cout << this->solution << std::endl;
 		};
-
+		
+		T operator[](size_t degree) {
+			if (degree < 0)
+				throw std::runtime_error("Неверный индекс!");
+			if (degree > this->maxDegree)
+				return 0;
+			return this->coefficients[degree];
+		}
 		~Function() {
 			delete[] this->coefficients;
 		}
@@ -177,6 +265,7 @@ namespace function_class {
 		}
 		return stream;
 	};
+	
 };
 	
 

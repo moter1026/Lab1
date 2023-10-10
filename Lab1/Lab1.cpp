@@ -23,8 +23,14 @@ int main()
 	FuncInt1.printSolution();
 	function_class::Function<float> FuncInt2(3, true);
 	std::cout << "2. " << FuncInt2 << std::endl;
+	FuncInt2.solutionOfEquation();
+	std::cout << "Решение 2: ";
+	FuncInt2.printSolution();
 	function_class::Function<double> FuncInt3(3, true);
 	std::cout << "3. " << FuncInt3 << std::endl;
+	FuncInt3.solutionOfEquation();
+	std::cout << "Решение 3: ";
+	FuncInt3.printSolution();
 	function_class::Function<std::complex<int>> FuncInt4(3, true);
 	std::cout << "4. " << FuncInt4 << std::endl;
 	function_class::Function<std::complex<float>> FuncInt5(3, true);
