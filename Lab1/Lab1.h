@@ -49,41 +49,14 @@ namespace function_class {
 			}
 		}
 		double solutionOfEquation() {};
-		T* operator +(StartFunction<T> secObj) {
-			max = (this->maxDegree > secObj.getMaxDegree()) ? this->maxDegree : secObj.getMaxDegree();
-			T* cof = new T[max + 1];
-			for (size_t i = 0; i <= max; i++)
-			{
-				if (i > this->maxDegree) {
-					cof[i] = secObj[i];
-					continue;
-				}
-				else if (i > secObj.getMaxDegree()) {
-					cof[i] = this->coefficients[i];
-					continue;
-				}
-				cof[i] = secObj[i] + this->coefficients[i];
-			}
-			return cof;
-		}
-		T* operator -(StartFunction<T> secObj) {
-			max = (this->maxDegree > secObj.getMaxDegree()) ? this->maxDegree : secObj.getMaxDegree();
-			T* cof = new T[max + 1];
-			for (size_t i = 0; i <= max; i++)
-			{
-				if (i > this->maxDegree) {
-					cof[i] = -secObj[i];
-					continue;
-				}
-				else if (i > secObj.getMaxDegree()) {
-					cof[i] = this->coefficients[i];
-					continue;
-				}
-				cof[i] = this->coefficients[i] - secObj[i];
-			}
-			return cof;
-		}
 		
+		T operator[](size_t degree) {
+			if (degree < 0)
+				throw std::runtime_error("Неверный индекс!");
+			if (degree > this->maxDegree)
+				return 0;
+			return this->coefficients[degree];
+		}
 		~StartFunction() = default;
 	};
 
@@ -144,7 +117,7 @@ namespace function_class {
 			this->typeOfT = typeid(T).name();
 			this->maxDegree = coef.size() - 1;
 			this->coefficients = new T[this->maxDegree + 1];
-			for (size_t i = 0; i < this->maxDegree; ++i) {
+			for (size_t i = 0; i <= this->maxDegree; ++i) {
 				this->coefficients[i] = coef[i];
 			}
 		};
@@ -175,14 +148,72 @@ namespace function_class {
 		void printSolution() {
 			std::cout << this->solution << std::endl;
 		};
-		
-		T operator[](size_t degree) {
-			if (degree < 0)
-				throw std::runtime_error("Неверный индекс!");
-			if (degree > this->maxDegree)
-				return 0;
-			return this->coefficients[degree];
+
+		// Оператор сложения с объектом такого же типа или другого
+		template <typename N>
+		Function<double>& operator +(StartFunction<N> secObj) {
+			auto maxDegree_ = (this->maxDegree > secObj.getMaxDegree()) ? this->maxDegree : secObj.getMaxDegree();
+			std::vector<double>* cof = new std::vector<double>(maxDegree_ + 1);
+			for (size_t i = 0; i <= maxDegree_; i++)
+			{
+				if (i > this->maxDegree) {
+					(*cof)[i] = double(secObj[i]);
+					continue;
+				}
+				else if (i > secObj.getMaxDegree()) {
+					(*cof)[i] = double(this->coefficients[i]);
+					continue;
+				}
+				(*cof)[i] = double(secObj[i]) + double(this->coefficients[i]);
+			}
+			Function<double>* func = new Function<double>((*cof));
+			return *func;
 		}
+		
+		// Оператор вычитания с объектом такого же типа или другого
+		template <typename N>
+		Function<double>& operator -(StartFunction<N> secObj) {
+			auto maxDegree_ = (this->maxDegree > secObj.getMaxDegree()) ? this->maxDegree : secObj.getMaxDegree();
+			std::vector<double>* cof = new std::vector<double>(maxDegree_ + 1);
+			for (size_t i = 0; i <= maxDegree_; i++)
+			{
+				if (i > this->maxDegree) {
+					(*cof)[i] = -double(secObj[i]);
+					continue;
+				}
+				else if (i > secObj.getMaxDegree()) {
+					(*cof)[i] = double(this->coefficients[i]);
+					continue;
+				}
+				(*cof)[i] = double(secObj[i]) - double(this->coefficients[i]);
+			}
+			Function<double>* func = new Function<double>((*cof));
+			return *func;
+		}
+		
+		// Оператор умножения и поддержка коммутативности
+		template <typename N>
+		Function<double>& operator *(N scalar) {
+			std::vector<double>* cof = new std::vector<double>(this->maxDegree + 1);
+			for (size_t i = 0; i <= this->maxDegree; i++)
+			{
+				(*cof)[i] = scalar * double(this->coefficients[i]);
+			}
+			Function<double>* func = new Function<double>((*cof));
+			return *func;
+		}
+		template <typename N>
+		friend Function<double>& operator *(N scalar, Function<T> func) {
+			std::vector<double>* cof = new std::vector<double>(func.getMaxDegree() + 1);
+			for (size_t i = 0; i <= func.getMaxDegree(); i++)
+			{
+				(*cof)[i] = scalar * double(func.getCoef(i));
+			}
+			Function<double>* new_func = new Function<double>((*cof));
+			return *new_func;
+		}
+
+
 		~Function() {
 			delete[] this->coefficients;
 		}
@@ -271,7 +302,6 @@ namespace function_class {
 
 
 	
-
 
 
 	
