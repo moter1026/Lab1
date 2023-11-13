@@ -283,6 +283,7 @@ namespace function_class {
 			Function<double>* new_func = new Function<double>(cof);
 			return *new_func;
 		}
+		
 
 		// вычисление значения многочлена при указанном значении х.
 		template <typename N>
@@ -360,8 +361,94 @@ namespace function_class {
 			else
 				fillngCoefficientsNotRandom(maxDegree);
 		};
-		
-		
+		Function(Function<std::complex<T>>& const func) {
+			this->typeOfT = func.typeOfT;
+			this->maxDegree = func.maxDegree;
+			this->coefficients = new std::complex<T>[this->maxDegree + 1];
+			for (size_t i = 0; i <= this->maxDegree; i++) {
+				this->coefficients[i] = func.coefficients[i];
+			}
+			this->solution = 0;
+		}
+		// Конструктор с параметрами: Вектор значений при соответствующих степенях
+		Function(std::vector<std::complex<T>> coef) {
+			this->typeOfT = typeid(T).name();
+			this->maxDegree = coef.size() - 1;
+			this->coefficients = new std::complex<T>[this->maxDegree + 1];
+			for (size_t i = 0; i <= this->maxDegree; ++i) {
+				this->coefficients[i] = coef[i];
+			}
+			this->solution = 0;
+		};
+
+
+		// Оператор умножения и поддержка коммутативности
+		template <typename N>
+		Function<std::complex<double>>& operator *(N scalar) {
+			std::vector<std::complex<double>> cof(this->maxDegree + 1);
+			for (size_t i = 0; i <= this->maxDegree; i++)
+			{
+				cof[i] = scalar * this->coefficients[i];
+			}
+			Function<std::complex<double>>* func = new Function<std::complex<double>>(cof);
+			return *func;
+		}
+		template <typename N>
+		friend Function<std::complex<double>>& operator *(N scalar, Function<std::complex<T>>& func) {
+			std::vector<std::complex<double>> cof(func.getMaxDegree() + 1);
+			for (size_t i = 0; i <= func.getMaxDegree(); i++)
+			{
+				cof[i] = scalar * func.getCoef(i);
+			}
+			Function<std::complex<double>>* new_func = new Function<std::complex<double>>(cof);
+			return *new_func;
+		}
+
+
+		// Оператор сложения с объектом такого же типа или другого
+		template <typename N>
+		Function<std::complex<double>>& operator +(StartFunction<std::complex<N>> secObj) {
+			auto maxDegree_ = (this->maxDegree > secObj.getMaxDegree()) ? this->maxDegree : secObj.getMaxDegree();
+			std::vector<std::complex<double>> cof(maxDegree_ + 1);
+			for (size_t i = 0; i <= maxDegree_; i++)
+			{
+				if (i > this->maxDegree) {
+					cof[i] = secObj[i];
+					continue;
+				}
+				else if (i > secObj.getMaxDegree()) {
+					cof[i] = this->coefficients[i];
+					continue;
+				}
+				cof[i] = secObj[i];
+				cof[i] += this->coefficients[i];
+			}
+			Function<std::complex<double>>* func = new Function<std::complex<double>>(cof);
+			return *func;
+		}
+
+		// Оператор вычитания с объектом такого же типа или другого
+		template <typename N>
+		Function<std::complex<double>>& operator -(StartFunction<std::complex<N>> secObj) {
+			auto maxDegree_ = (this->maxDegree > secObj.getMaxDegree()) ? this->maxDegree : secObj.getMaxDegree();
+			std::vector<std::complex<double>> cof(maxDegree_ + 1);
+			for (size_t i = 0; i <= maxDegree_; i++)
+			{
+				if (i > this->maxDegree) {
+					cof[i] = -secObj[i];
+					continue;
+				}
+				else if (i > secObj.getMaxDegree()) {
+					cof[i] = this->coefficients[i];
+					continue;
+				}
+				cof[i] = secObj[i];
+				cof[i] -= this->coefficients[i];
+			}
+			Function<std::complex<double>>* func = new Function<std::complex<double>>(cof);
+			return *func;
+		}
+
 		// вычисление значения многочлена при указанном значении х.
 		template <typename N>
 		std::complex<double> calculation(N x) {

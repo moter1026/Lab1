@@ -87,11 +87,35 @@ int main()
 
 	std::cout << "Вычисление комплексной функции при x=10:\n";
 	std::cout << FuncComplInt1.calculation(10) << std::endl;
+	std::complex<int> coplInt(7, 4);
+	std::vector<std::complex<int>> vec(5, coplInt);
+	std::cout << "Умножение на скаляр (func * 5)\n";
+	std::cout << FuncComplInt1 * 5 << std::endl;
+	std::cout << "Правило коммутативности (5 * func)\n";
+	std::cout << 5 * FuncComplInt1 << std::endl;
+	
+
+	std::cout << "конструктор с вектором\n";
+	function_class::Function<std::complex<int>> FuncComplInt2(vec);
+	std::cout << FuncComplInt2 << std::endl;
+
+	std::cout << "конструктор копирования\n";
+	function_class::Function<std::complex<int>> FuncComplInt3(FuncComplInt1);
+	std::cout << FuncComplInt3 << std::endl;
+
+
+	
 
 
 	function_class::Function<std::complex<float>> FuncComplFloat1(3, true);
 	std::cout << "6. " << FuncComplFloat1 << std::endl;
 
+	auto res1 = FuncComplInt1 + FuncComplFloat1;
+	std::cout << "Сумма двух многочленов:\n";
+	std::cout << res1 << std::endl;
+	res1 = (FuncComplInt1 - FuncComplFloat1);
+	std::cout << "Разность двух многочленов:\n";
+	std::cout << res1 << std::endl;
 
 	std::cout << "Вычисление комплексной функции при x=10:\n";
 	std::cout << FuncComplFloat1.calculation(10) << std::endl;
