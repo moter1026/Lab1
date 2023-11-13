@@ -82,9 +82,26 @@ int main()
 
 	function_class::Function<std::complex<int>> FuncComplInt1(3, true);
 	std::cout << "5. " << FuncComplInt1 << std::endl;
+
+	//std::cout << "\n\n" <<  5 * std::complex(12,10) << std::endl;
+
+	std::cout << "Вычисление комплексной функции при x=10:\n";
+	std::cout << FuncComplInt1.calculation(10) << std::endl;
+
+
 	function_class::Function<std::complex<float>> FuncComplFloat1(3, true);
 	std::cout << "6. " << FuncComplFloat1 << std::endl;
+
+
+	std::cout << "Вычисление комплексной функции при x=10:\n";
+	std::cout << FuncComplFloat1.calculation(10) << std::endl;
+
+
 	function_class::Function<std::complex<double>> FuncComplDouble1(3, true);
 	std::cout << "7. " << FuncComplDouble1 << std::endl;
+
+
+	std::cout << "Вычисление комплексной функции при x=10:\n";
+	std::cout << FuncComplDouble1.calculation(10) << std::endl;
 	return 0;
 }

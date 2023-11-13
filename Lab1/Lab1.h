@@ -83,6 +83,34 @@ namespace function_class {
 			swap(func2);
 			return *this;
 		}
+
+		// метод shrink_to_fit уменьшающий размер многочлена до
+		// минимально возможного при наличии ведущих нулей
+		void shrink_to_fit() {
+			int fitMaxDegree = this->maxDegree;
+
+			for (size_t i = fitMaxDegree; i > 0; --i)
+			{
+				if (this->coefficients[i] == 0) {
+					--fitMaxDegree;
+				}
+				else if ((this->coefficients[i] != 0)) {
+					break;
+				}
+			}
+			if (fitMaxDegree == this->maxDegree)
+			{
+				return;
+			}
+			this->maxDegree = fitMaxDegree;
+			T* newCoef = new T[this->maxDegree + 1];
+			for (size_t i = 0; i <= this->maxDegree; ++i)
+			{
+				newCoef[i] = this->coefficients[i];
+			}
+			delete this->coefficients;
+			this->coefficients = newCoef;
+		}
 		~StartFunction() = default;
 	};
 
@@ -267,37 +295,7 @@ namespace function_class {
 			return result;
 		}
 
-		// метод shrink_to_fit уменьшающий размер многочлена до
-		// минимально возможного при наличии ведущих нулей
-		void shrink_to_fit() {
-			int fitMaxDegree = this->maxDegree;
-
-			for (size_t i = fitMaxDegree; i > 0 ; --i)
-			{
-				if (this->coefficients[i] == 0) {
-					--fitMaxDegree;
-				}
-				else if((this->coefficients[i] != 0)) {
-					break;
-				}
-			}
-			if (fitMaxDegree == this->maxDegree)
-			{
-				return;
-			}
-			this->maxDegree = fitMaxDegree;
-			T* newCoef = new T[this->maxDegree + 1];
-			for (size_t i = 0; i <= this->maxDegree; ++i)
-			{
-				newCoef[i] = this->coefficients[i];
-			}
-			delete this->coefficients;
-			this->coefficients = newCoef;
-		}
-
-		
-		
-
+	
 		~Function() {
 			delete[] this->coefficients;
 		}
@@ -362,8 +360,21 @@ namespace function_class {
 			else
 				fillngCoefficientsNotRandom(maxDegree);
 		};
-
-
+		
+		
+		// вычисление значения многочлена при указанном значении х.
+		template <typename N>
+		std::complex<double> calculation(N x) {
+			std::complex<double> result = 0;
+			std::complex<double> product = 0;
+			for (size_t i = 0; i < this->getMaxDegree() + 1; ++i)
+			{
+				product = this->getCoef(i);
+				product *= pow(x, i);
+				result += product;
+			}
+			return result;
+		}
 
 		~Function() {
 			delete[] this->coefficients;
